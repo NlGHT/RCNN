@@ -68,7 +68,6 @@ def getBBs(filename, colours):
     print(filenameWithoutEnd)
     print(highLows)
     print(len(highLows))
-    exit()
     saveCSV(filenameWithoutEnd + ".csv", len(highLows), highLows)
     sys.exit()
 
