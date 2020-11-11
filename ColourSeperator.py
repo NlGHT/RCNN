@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import csv
 
 # Minimum percentage of pixels of same hue to consider dominant colour
 MIN_PIXEL_CNT_PCT = (1.0/1000.0)
