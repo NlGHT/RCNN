@@ -16,46 +16,51 @@ def saveCSV(filename, rois, rows):
         csvwriter.writerows(rows)
 
 
-def getBBs(filename):
-    # Minimum percentage of pixels of same hue to consider dominant colour
-    MIN_PIXEL_CNT_PCT = (1.0/10000.0)
-
-    image = cv2.imread(filename)
+def countColours(filename):
+    colours = []
+    image = cv2.imread(filename, cv2.IMREAD_COLOR)
     if image is None:
         print("Failed to load iamge.")
         exit(-1)
 
-    image_hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-    # We're only interested in the hue
-    h,_,_ = cv2.split(image_hsv)
-    # Let's count the number of occurrences of each hue
-    bins = np.bincount(h.flatten())
-    print(bins)
-    # And then find the dominant hues
-    peaks = np.where(bins > (h.size * MIN_PIXEL_CNT_PCT))[0]
+    r,g,b = cv2.split(image)
+    for y in range(image.shape[0]):
+        for x in range(image.shape[1]):
+            valR = r[y, x]
+            valG = g[y, x]
+            valB = b[y, x]
+            if valR > 0 or valG > 0 or valB > 0:
+                testColour = (float(valR), float(valG), float(valB))
+                if testColour not in colours:
+                    colours.append(testColour)
 
-    peaks = np.array(peaks)
-    print(peaks)
+    return colours
 
-    highLows = [[]]
+
+def getBBs(filename, colours):
+    image = cv2.imread(filename, cv2.IMREAD_COLOR)
+    if image is None:
+        print("Failed to load iamge.")
+        exit(-1)
+
+    highLows = []
     # Now let's find the shape matching each dominant hue
-    for i, peak in enumerate(peaks):
+    for i in range(len(colours)):
+        colour = colours[i]
         # First we create a mask selecting all the pixels of this hue
-        peak = np.array(peak)
-        mask = cv2.inRange(h, peak, peak)
+        print(colour)
+        mask = cv2.inRange(image, colour, colour)
         xHighest = 0
         xLowest = mask.shape[1]
         yHighest = 0
         yLowest = mask.shape[0]
-        if peak != 0:
-            for y in range(mask.shape[0]):
-                for x in range(mask.shape[1]):
-                    if mask[y, x] == 255:
-                        xHighest = np.maximum(xHighest, x)
-                        xLowest  = np.minimum(xLowest, x)
-                        yHighest = np.maximum(yHighest, y)
-                        yLowest  = np.minimum(yLowest, y)
-
+        for y in range(mask.shape[0]):
+            for x in range(mask.shape[1]):
+                if mask[y, x] == 255:
+                    xHighest = np.maximum(xHighest, x)
+                    xLowest  = np.minimum(xLowest, x)
+                    yHighest = np.maximum(yHighest, y)
+                    yLowest  = np.minimum(yLowest, y)
 
         highLows.append([xLowest, yLowest, xHighest, yHighest])
 
@@ -74,5 +79,7 @@ for dirname in os.listdir(SOBA_DIR):
     for image in os.listdir(SOBA_DIR + dirname):
         if image[-6:] == "-3.png":
             path = SOBA_DIR + dirname + "/" + image
-            getBBs(path)
+            colours = countColours(path)
+            print(colours)
+            getBBs(path, colours)
 
