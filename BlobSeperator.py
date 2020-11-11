@@ -1,6 +1,8 @@
 # Standard imports
 import cv2
 import numpy as np
+import os
+import sys
 
 def detectImage(image):
     # Read image
@@ -55,11 +57,10 @@ def detectImage(image):
 
 
 # Load all the files with -3
-import os
-import sys
 SOBA_DIR = "./SOBA/SOBA/"
 for dirname in os.listdir(SOBA_DIR):
     for image in os.listdir(SOBA_DIR + dirname):
         if image[-6:] == "-3.png":
-            detectImage(image)
+            path = SOBA_DIR + dirname + "/" + image
+            detectImage(path)
             break
