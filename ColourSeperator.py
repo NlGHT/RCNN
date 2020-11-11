@@ -19,11 +19,37 @@ peaks = np.where(bins > (h.size * MIN_PIXEL_CNT_PCT))[0]
 
 peaks = np.array(peaks)
 
+maxXs = []
+maxYs = []
+minXs = []
+minYs = []
 # Now let's find the shape matching each dominant hue
 for i, peak in enumerate(peaks):
     # First we create a mask selecting all the pixels of this hue
     peak = np.array(peak)
     mask = cv2.inRange(h, peak, peak)
+    xHighest = 0
+    xLowest = mask.shape[1]
+    yHighest = 0
+    yLowest = mask.shape[0]
+    if peak != 0:
+        for y in range(mask.shape[0]):
+            for x in range(mask.shape[1]):
+                if mask[y, x] == 255:
+                    xHighest = np.maximum(xHighest, x)
+                    xLowest  = np.minimum(xLowest, x)
+                    yHighest = np.maximum(yHighest, y)
+                    yLowest  = np.minimum(yLowest, y)
+
+
+        maxXs.append(xHighest)
+        maxYs.append(yHighest)
+        minXs.append(xLowest)
+        minYs.append(yLowest)
+        cv2.imshow("Mask", mask)
+        cv2.waitKey(0)
+    continue
+
     # And use it to extract the corresponding part of the original colour image
     blob = cv2.bitwise_and(image, image, mask=mask)
     ##cv2.imshow("BloB",blob)
@@ -59,3 +85,14 @@ for i, peak in enumerate(peaks):
         file_name_bbox = "colourblobs-%d-hue_%03d-region_%d-bbox.png" % (i, peak, j)
         #cv2.imwrite(file_name_bbox, result)
         print (" * wrote '%s'" % file_name_bbox)
+
+
+
+
+for x in range(maxXs):
+    print(x)
+
+print(maxXs)
+print(maxYs)
+print(minXs)
+print(minYs)
