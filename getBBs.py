@@ -69,7 +69,7 @@ def getBBs(filename, colours):
     print(highLows)
     print(len(highLows))
     saveCSV(filenameWithoutEnd + ".csv", len(highLows), highLows)
-    sys.exit()
+    #sys.exit()
 
 
 # Load all the files with -3
