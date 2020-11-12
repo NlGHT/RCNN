@@ -3,8 +3,13 @@ import sys
 import csv
 import cv2
 import numpy as np
+import re
 
 def saveCSV(filename, rois, rows):
+    filename = filename.split("/")[-1]
+    filename = os.path.join(ANNO_DIR, filename)
+    print(filename)
+
     # writing to csv file
     with open(filename, 'w', newline='') as csvfile:
         # creating a csv writer object
@@ -73,7 +78,8 @@ def getBBs(filename, colours):
 
 
 # Load all the files with -3
-SOBA_DIR = "./SOBA/SOBA/"
+SOBA_DIR = "./Images/"
+ANNO_DIR = "./Annotations/"
 for dirname in os.listdir(SOBA_DIR):
     for image in os.listdir(SOBA_DIR + dirname):
         if image[-6:] == "-3.png":
